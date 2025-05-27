@@ -1,0 +1,116 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-app-primary
+  labels:
+    app: my-app
+    version: primary
+  annotations:
+    harness.io/direct-apply: "true"
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: my-app
+      version: primary
+  template:
+    metadata:
+      labels:
+        app: my-app
+        version: primary
+    spec:
+      containers:
+        - name: my-app
+          image: reethu2/sample3:latest
+          ports:
+            - containerPort: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-app-canary
+  labels:
+    app: my-app
+    version: canary
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: my-app
+      version: canary
+  template:
+    metadata:
+      labels:
+        app: my-app
+        version: canary
+    spec:
+      containers:
+        - name: my-app
+          image: reethu2/sample4:latest
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-app
+  annotations:
+    cloud.google.com/neg: '{"ingress": true}'
+spec:
+  type: LoadBalancer
+  selector:
+    app: my-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: my-app
+spec:
+  host: my-app
+  subsets:
+    - name: primary
+      labels:
+        version: primary
+    - name: canary
+      labels:
+        version: canary
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: traffic-split-my-app
+spec:
+  hosts:
+    - "*"
+  gateways:
+    - my-app-gateway
+  http:
+    - route:
+        - destination:
+            host: my-app
+            subset: primary
+          weight: 50
+        - destination:
+            host: my-app
+            subset: canary
+          weight: 50
+---
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: my-app-gateway
+  namespace: istio-system
+spec:
+  selector:
+    istio: ingressgateway  # default Istio gateway selector
+  servers:
+    - port:
+        number: 80
+        name: http
+        protocol: HTTP
+      hosts:
+        - "*"
