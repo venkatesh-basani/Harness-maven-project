@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: java-app-deployment
+  labels:
+    app: java-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: java-app
+  template:
+    metadata:
+      labels:
+        app: java-app
+    spec:
+      containers:
+        - name: java-app
+          image: https://trialegc4f0.jfrog.io/artifactory/maven-local-docker/latest
+          ports:
+            - containerPort: 8080
+      imagePullSecrets:
+        - name: jfrog-registry-secret
