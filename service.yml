@@ -3,10 +3,9 @@ kind: Service
 metadata:
   name: java-app-service
 spec:
+  type: LoadBalancer  # Note: capital 'B'
   selector:
     app: java-app
   ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 8080
-  type: Loadbalancer
+  - port: 80
+    targetPort: 8080
