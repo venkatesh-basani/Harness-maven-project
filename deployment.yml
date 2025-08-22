@@ -2,10 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: java-app-deployment
-  labels:
-    app: java-app
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: java-app
@@ -15,9 +13,14 @@ spec:
         app: java-app
     spec:
       containers:
-        - name: java-app
-          image: https://trialegc4f0.jfrog.io/artifactory/maven-local-docker/latest
-          ports:
-            - containerPort: 8080
-      imagePullSecrets:
-        - name: jfrog-registry-secret
+      - name: java-app
+        image: rajukolupula/maven-repo:latest
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "512Mi"
+          limits:
+            cpu: "1000m"
+            memory: "1024Mi"
