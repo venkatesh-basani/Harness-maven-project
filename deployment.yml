@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: auto-cluster
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: auto-cluster
