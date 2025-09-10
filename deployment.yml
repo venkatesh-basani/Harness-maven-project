@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: java-app
+  name: auto-cluster
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: java-app
+      app: auto-cluster
   template:
     metadata:
       labels:
-        app: java-app
+        app: auto-cluster
     spec:
       containers:
       - name: java-app
