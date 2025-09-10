@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
       - name: java-app
-        image: rajukolupula/maven-repo:latest
+        image: basanivenkatesh/harness_test1:latest
         ports:
         - containerPort: 8080
